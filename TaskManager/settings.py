@@ -11,21 +11,26 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Initialize environ
+env = environ.Env()
+environ.Env.read_env(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g&53n!q##hb2t#m_v_=hc702qm3dcn5&jy=#cgr0((k&gc1&ug'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 
 # Application definition
@@ -38,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Task',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -80,6 +86,11 @@ DATABASES = {
     }
 }
 
+# Optional: Database URL configuration (uncomment to use)
+# DATABASES = {
+#     'default': env.db(),
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -121,3 +132,19 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+#DRF Spectacular
+
+REST_FRAMEWORK = {
+    # تنظیم اسکیمرساز پیش‌فرض روی drf-spectacular
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# (اختیاری) تنظیمات مربوط به مشخصات پروژه و مستندات
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'TaskManager',
+    'DESCRIPTION': 'TaskManager documentation',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
