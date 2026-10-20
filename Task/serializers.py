@@ -1,9 +1,15 @@
 from rest_framework import serializers
 from .models import Project, Task, Comment
+from django.contrib.auth.models import User
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    assigned_to = serializers.ReadOnlyField(source='assigned_to.username')
+    assigned_to = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True
+    )
     class Meta:
         model = Task
         fields = ['title', 'description', 'project', 'assigned_to', 'status', 'priority', 'due_date', 'created_at', 'updated_at']

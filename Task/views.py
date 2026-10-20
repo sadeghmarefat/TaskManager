@@ -6,6 +6,7 @@ from .models import Project, Task, Comment
 from .serializers import ProjectSerializer, TaskSerializer, CommentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from .tasks import send_task_notification
 
 
 class IsOwnerOrMember(BasePermission):
@@ -42,6 +43,15 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.select_related('project', 'assigned_to').filter(Q(owner=self.request.user) | Q(members__in=[self.request.user]))
+
+    def perform_create(self, serializer):
+        task = serializer.save()
+        # چاپ برای دیباگ کردن در ترمینال جنگو
+        print(f"DEBUG: Task created -> {task.title}, Assigned to: {task.assigned_to}")
+
+        if task.assigned_to and task.assigned_to.email:
+            send_task_notification.delay(task.assigned_to.email, task.title)
+            print("DEBUG: Celery task triggered successfully!")
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
