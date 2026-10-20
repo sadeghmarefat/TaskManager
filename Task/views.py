@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from .models import Project, Task, Comment
 from .serializers import ProjectSerializer, TaskSerializer, CommentSerializer
 
+
 class IsOwnerOrMember(BasePermission):
     def has_object_permission(self, request, view, obj):
         if isinstance(obj, Project):
@@ -32,6 +33,9 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsOwnerOrMember]
+    filterset_fields = ['project', 'assigned_to','priority', 'status']
+    search_fields = ['title', 'description']
+    ordering_fields = ['created_at', 'priority','due_date']
 
     def get_queryset(self):
         return self.queryset.select_related('project', 'assigned_to').filter(Q(owner=self.request.user) | Q(members__in=[self.request.user]))

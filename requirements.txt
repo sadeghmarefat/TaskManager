@@ -17,3 +17,4 @@ types-PyYAML==6.0.12.20260906
 typing_extensions==4.16.0
 uritemplate==4.2.0
 django-environ==0.14.0
+djangorestframework-simplejwt==5.5.0
